@@ -11,7 +11,7 @@ const mdiFormCoreUtils = {
     })
 }
 const mdiFormCoreZIndex = {
-    startFrom: 9900,
+    startFrom: 0,
     forms:[],
     register:(dom, env)=> {
         const zIndex = mdiFormCoreZIndex.startFrom++;
@@ -66,6 +66,8 @@ const mdiFormCore = () => {
         mdiFormCoreUtils.isMobile = !!navigator.userAgent.match(/mobile/i);
         mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
         mdiFormCoreUtils.throttle = obj.throttle || 10;
+        mdiFormCoreZIndex.startFrom = obj.zIndexStartFrom || 9900;
+    
         const modal = el(obj.mdWrapper);
         const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
         mdiFormCoreZIndex.register(modal, env);
