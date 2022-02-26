@@ -255,7 +255,7 @@ const resizeCoreConfiguration = (conf) => {
                     elm.addEventListener(env.start,leftResizeHandler,false)
                 } break;
             }
-            elm.style.background = ['blue','orange','red','green','brown','purple','magenta','yellow'][i]
+            //elm.style.background = ['blue','orange','red','green','brown','purple','magenta','yellow'][i] // debug
 
             elm.style.top = top;
             elm.style.left = left;
