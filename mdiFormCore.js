@@ -22,7 +22,7 @@ const mdiFormCore = () => {
         mdiFormCoreUtils.throttle = obj.throttle || 10;
         mdiFormCoreZIndex.startFrom = obj.zIndexStartFrom || 9900;
 
-        const pad = obj.resizePad || 0;
+        const pad = !obj.resizePad || obj.resizePad < 10? 10: obj.resizePad;
         const modal = el(obj.mdWrapper);
         const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
         return {
