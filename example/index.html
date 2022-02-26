@@ -4,54 +4,69 @@
     </head>
     <body>
         <div id="limit">
-            <div id="wrapper">
+            <div id="wrapper-multiwindow-1">
                 <div class="title">Título</div>
                 <div class="content">Lorem Ipsum is simply dummy text of <br/>the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took <br/>a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently<br/>with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</div>
             </div>
-            <div id="wrapper2">
-                <div class="title2">Título2</div>
+            <div id="wrapper-multiwindow-2">
+                <div class="title">Título2</div>
                 <div class="content2">Lorem Ipsum is simply dummy text of </div>
+            </div>
+            <div id="wrapper-multiwindow-3">
+                <div class="title">Título3</div>
+                <br class="content2">Lorem Ipsum is simply dummy text of<br/>asjdkfjlasdkhjfalksdfas<br/> </div>
             </div>
         </div>
         
         <script type="text/javascript">
             const core = mdiFormCore()
+                .parent("body")
             core.create({
-                mdWrapper:"#wrapper",
+                mdWrapper:"#wrapper-multiwindow-1",
                 moveWrapper: ".title",
                 resizePad: 10,
                 resizable: true        
             })
             core.create({
-                mdWrapper:"#wrapper2",
-                moveWrapper: ".title2",
+                mdWrapper:"#wrapper-multiwindow-2",
+                moveWrapper: ".title",
                 resizePad: 5,
-                resizable: true        
+                resizable: true
+            })
+            core.create({
+                parent:"#limit",
+                mdWrapper:"#wrapper-multiwindow-3",
+                moveWrapper: ".title",
+                resizable: false
             })
         </script>
         <style>
-            #wrapper {
+            #wrapper-multiwindow-1, #wrapper-multiwindow-2, #wrapper-multiwindow-3 {
                 background: #fc0;
-                width: 300px;
-                height:200px;
                 display: flex;
                 flex-direction: column;
+                width: 300px;
+                height:200px;
+            }
+            #wrapper-multiwindow-1 {
                 top: 100px;
                 left: 100px
             }
-            #wrapper2 {
+            #wrapper-multiwindow-2 {
                 background: #ff00c8;
-                width: 500px;
-                height: 300px;
-                display: flex;
-                flex-direction: column;
                 top: 150px;
                 left: 170px
             }
-            #wrapper .content {
+            #wrapper-multiwindow-3 {
+                background: #c84400;
+                top: 50px;
+                left: 70px;
+            }
+            .content {
                 overflow-y: scroll;
                 flex:1;
             }
+
             #limit {
                 width: 500px;
                 height: 600px;

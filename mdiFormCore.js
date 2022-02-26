@@ -1,6 +1,79 @@
+
+const mdiFormCore = () => {
+    const buildConf = (obj) => {
+        const el = (str) => document.querySelector(str);
+        const envEvents = {
+            "mobile": {
+                start: "touchstart",
+                move: "touchmove",
+                end: "touchend",
+                out: "touchout"
+            },
+            "web": {
+                start: "mousedown",
+                move: "mousemove",
+                end: "mouseup",
+                out: "mouseout"
+            }
+        }
+        if(!mdiFormCore.parent) mdiFormCore.parent = el("body");
+        mdiFormCoreUtils.isMobile = !!navigator.userAgent.match(/mobile/i);
+        mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
+        mdiFormCoreUtils.throttle = obj.throttle || 10;
+        mdiFormCoreZIndex.startFrom = obj.zIndexStartFrom || 9900;
+    
+        const modal = el(obj.mdWrapper);
+        const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
+        return {
+            modal,
+            env,
+            pad: obj.resizePad,
+            mover: modal.querySelector(obj.moveWrapper)
+        }
+    }
+
+    const setupStyles = (conf) => {
+        const {modal,mover, pad} = conf;
+        modal.style.padding = pad;
+        modal.style.position = "absolute";
+        mover.style.cursor = "move"
+        mover.style.userSelect = "none"
+    }
+    const factory = {
+        parent: (str) => {
+            mdiFormCore.parent = document.querySelector(str)
+            return factory;
+        },
+        create:(obj) => {
+            setTimeout(() => { // await rendenization
+                let processMoveEvent, processResizeEvent;
+                const conf = buildConf(obj);
+                setupStyles(conf);
+                mdiFormCoreZIndex.register(conf)
+                
+                processMoveEvent = moverCoreConfigurator(conf);
+                if(obj.resizable) processResizeEvent = resizeCoreConfiguration(conf)
+
+                const processProxy = (e) => {
+                    if(e.target !== conf.mover) return;
+                    processMoveEvent(e);
+                }
+                conf.modal.addEventListener(conf.env.start, processProxy,false);
+            },0)
+        }
+    }
+    return factory;
+}
+
 const mdiFormCoreUtils = {
     isMobile: false,
     touchAcceleration: 1.5,
+    toggleUserSelect: (bool) => {
+        const value = bool? 'inherit': 'none';
+        mdiFormCoreZIndex.forms.forEach(e => {
+            e.dom.style.userSelect = value;
+        })
+    },
     getScreens: (e) => ({
         screenX: !mdiFormCoreUtils.isMobile? e.screenX : e.changedTouches[0].screenX * mdiFormCoreUtils.touchAcceleration, // web or mobile
         screenY: !mdiFormCoreUtils.isMobile? e.screenY : e.changedTouches[0].screenY * mdiFormCoreUtils.touchAcceleration // web or mobile
@@ -13,7 +86,8 @@ const mdiFormCoreUtils = {
 const mdiFormCoreZIndex = {
     startFrom: 0,
     forms:[],
-    register:(dom, env)=> {
+    register:(conf)=> {
+        const {modal:dom, env} = conf;
         const zIndex = mdiFormCoreZIndex.startFrom++;
         mdiFormCoreZIndex.forms.push({dom,zIndex});
         mdiFormCoreZIndex.renderZIndex();
@@ -45,73 +119,10 @@ const mdiFormCoreZIndex = {
     }
 }
 
-const mdiFormCore = () => {
-    const buildConf = (obj) => {
-        const el = (str) => document.querySelector(str);
-        const envEvents = {
-            "mobile": {
-                start: "touchstart",
-                move: "touchmove",
-                end: "touchend",
-                out: "touchout"
-            },
-            "web": {
-                start: "mousedown",
-                move: "mousemove",
-                end: "mouseup",
-                out: "mouseout"
-            }
-        }
-
-        mdiFormCoreUtils.isMobile = !!navigator.userAgent.match(/mobile/i);
-        mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
-        mdiFormCoreUtils.throttle = obj.throttle || 10;
-        mdiFormCoreZIndex.startFrom = obj.zIndexStartFrom || 9900;
-    
-        const modal = el(obj.mdWrapper);
-        const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
-        mdiFormCoreZIndex.register(modal, env);
-        console.log(mdiFormCoreZIndex.forms)
-        return {
-            modal,
-            env,
-            pad: obj.resizePad,
-            parent: el(obj.parent || "body"),
-            mover: el(obj.moveWrapper)
-        }
-    }
-
-    const setupStyles = (conf) => {
-        const {modal,mover, pad} = conf;
-        modal.style.padding = pad;
-        modal.style.position = "absolute";
-        mover.style.cursor = "move"
-        mover.style.userSelect = "none"
-    }
-
-    return {
-        create:(obj) => {
-            setTimeout(() => { // await rendenization
-                let processMoveEvent, processResizeEvent;
-                const conf = buildConf(obj);
-                setupStyles(conf);
-                
-                processMoveEvent = moverCoreConfigurator(conf);
-                if(obj.resizable) processResizeEvent = resizeCoreConfiguration(conf)
-
-                const processProxy = (e) => {
-                    if(e.target !== conf.mover) return;
-                    processMoveEvent(e);
-                }
-                conf.modal.addEventListener(conf.env.start, processProxy,false);
-            },0)
-        }
-    }
-}
-
 const resizeCoreConfiguration = (conf) => {
     let elms = {};
-    let { parent, pad, modal, mover, env } = conf;
+    let { pad, modal, mover, env } = conf;
+    let {parent} = mdiFormCore;
     const {x:pX,y:pY,width:pW,height:pH} = parent.getBoundingClientRect();
     const initialModalBounds = modal.getBoundingClientRect();
     const {width:mW,height:mH} = initialModalBounds;
@@ -119,7 +130,7 @@ const resizeCoreConfiguration = (conf) => {
     const cancelHandlers = (handler) => {
         window.addEventListener(env.move, handler, false);
         window.addEventListener(env.end, (e) => {
-            modal.style.userSelect = 'inherit'
+            mdiFormCoreUtils.toggleUserSelect(true)
             window.removeEventListener(env.move, handler, false)
             window.removeEventListener(env.end, handler, false)
         }, false);
@@ -128,7 +139,7 @@ const resizeCoreConfiguration = (conf) => {
     const topResizeHandler = (e) => {
         const {y:mY,height:mH} = modal.getBoundingClientRect();
         const handler = (e) => {
-            modal.style.userSelect = 'none'
+            mdiFormCoreUtils.toggleUserSelect(false)
             let {clientY} = mdiFormCoreUtils.getClients(e);
             const diff = mY - clientY;
             const nextHeight = diff + mH;
@@ -144,10 +155,9 @@ const resizeCoreConfiguration = (conf) => {
     const rightResizeHandler = () => {
         const {x:mX} = modal.getBoundingClientRect();
         const handler = (e) => {
-            modal.style.userSelect = 'none'
+            mdiFormCoreUtils.toggleUserSelect(false)
             const {clientX} = mdiFormCoreUtils.getClients(e);
             const nextWidth = clientX - mX;
-            console.log((pX + pW))
             if(mX + nextWidth + (pad * 2) > Math.abs(pX + pW)) return;
             modal.style.width = nextWidth;
             elms['r'].style.left = elms['br'].style.left = elms['tr'].style.left = elms['t'].style.width = elms['b'].style.width = nextWidth + pad;
@@ -158,7 +168,7 @@ const resizeCoreConfiguration = (conf) => {
     const bottomResizeHandler = () => {
         const {y:mY} = modal.getBoundingClientRect();
         const handler = (e) => {
-            modal.style.userSelect = 'none'
+            mdiFormCoreUtils.toggleUserSelect(false)
             const {clientY} = mdiFormCoreUtils.getClients(e);
             const nextHeight = clientY - mY;
             if(mY + nextHeight + (pad / 2) > Math.abs(pY - pH)) return;
@@ -170,7 +180,7 @@ const resizeCoreConfiguration = (conf) => {
     const leftResizeHandler = (e) => {
         const {x:mX,width:mW} = modal.getBoundingClientRect();
         const handler = (e) => {
-            modal.style.userSelect = 'none'
+            mdiFormCoreUtils.toggleUserSelect(false)
             let {clientX} = mdiFormCoreUtils.getClients(e);
             const diff = clientX - mX;
             const nextWidth = mW - diff - pad;
@@ -249,8 +259,9 @@ const resizeCoreConfiguration = (conf) => {
 }
 
 const moverCoreConfigurator = (conf) => {
-    let {parent, modal,pad, env } = conf;
-    let initialY, initialX, initialParentBounds, limitX, limitY, isMoving, enableCaller = true;
+    let {modal,pad, env} = conf;
+    let {parent} = mdiFormCore;
+    let initialY, initialX, initialParentBounds, limitX, limitY, enableCaller = true;
 
     const dragStart = (e) => {
         isMoving = true;
