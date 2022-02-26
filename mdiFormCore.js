@@ -21,13 +21,14 @@ const mdiFormCore = () => {
         mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
         mdiFormCoreUtils.throttle = obj.throttle || 10;
         mdiFormCoreZIndex.startFrom = obj.zIndexStartFrom || 9900;
-    
+
+        const pad = obj.resizePad || 0;
         const modal = el(obj.mdWrapper);
         const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
         return {
             modal,
             env,
-            pad: obj.resizePad,
+            pad,
             mover: modal.querySelector(obj.moveWrapper)
         }
     }
@@ -260,6 +261,7 @@ const resizeCoreConfiguration = (conf) => {
 
 const moverCoreConfigurator = (conf) => {
     let {modal,pad, env} = conf;
+
     let {parent} = mdiFormCore;
     let initialY, initialX, initialParentBounds, limitX, limitY, enableCaller = true;
 
@@ -295,7 +297,7 @@ const moverCoreConfigurator = (conf) => {
 
         let nextY = (screenY - initialY);
         let nextX = (screenX - initialX);
-
+        
         if(nextX < pX) nextX = pX; // left limit x 
         if(nextX - pad + 2 > limitX) nextX = limitX + pad - 2; // right limit x
 

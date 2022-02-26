@@ -20,7 +20,7 @@
         
         <script type="text/javascript">
             const core = mdiFormCore()
-                .parent("body")
+                .parent("#limit")
             core.create({
                 mdWrapper:"#wrapper-multiwindow-1",
                 moveWrapper: ".title",
@@ -68,8 +68,8 @@
             }
 
             #limit {
-                width: 500px;
-                height: 600px;
+                width: calc(100vw - 100px);
+                height: calc(100vh - 50px);
                 background: #f0f0f0;
             }
         </style>
