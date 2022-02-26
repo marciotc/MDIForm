@@ -10,6 +10,40 @@ const mdiFormCoreUtils = {
         clientY: !mdiFormCoreUtils.isMobile? e.clientY : e.changedTouches[0].clientY // web or mobile
     })
 }
+const mdiFormCoreZIndex = {
+    startFrom: 9900,
+    forms:[],
+    register:(dom)=> {
+        const zIndex = mdiFormCoreZIndex.startFrom++;
+        mdiFormCoreZIndex.forms.push({dom,zIndex});
+        mdiFormCoreZIndex.renderZIndex();
+        dom.addEventListener("click",mdiFormCoreZIndex.buildIndex,false)
+    },
+    getArrayIndex: (dom) => {
+        let index = -1;
+        const forms = mdiFormCoreZIndex.forms;
+        for (let i=0; forms.length;i++) {
+            const cursor = forms[i];
+            if(cursor.dom !== dom) continue;
+            index = i;
+            break;
+        }
+        return index;
+    },
+    renderZIndex: () => {
+        mdiFormCoreZIndex.forms.forEach((e,i) => {
+            e.dom.style.zIndex = mdiFormCoreZIndex.startFrom+i;
+        })
+    },
+    buildIndex: (e) => {
+        const dom = e.currentTarget;
+        const index = mdiFormCoreZIndex.getArrayIndex(dom);
+        if(index === -1) return;
+        const tmp = mdiFormCoreZIndex.forms.splice(index,1);
+        mdiFormCoreZIndex.forms.push(tmp[0]);
+        mdiFormCoreZIndex.renderZIndex();
+    }
+}
 
 const mdiFormCore = () => {
     const buildConf = (obj) => {
@@ -32,12 +66,14 @@ const mdiFormCore = () => {
         mdiFormCoreUtils.isMobile = !!navigator.userAgent.match(/mobile/i);
         mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
         mdiFormCoreUtils.throttle = obj.throttle || 10;
-
+        const modal = el(obj.mdWrapper);
+        mdiFormCoreZIndex.register(modal);
+        console.log(mdiFormCoreZIndex.forms)
         return {
+            modal,
             env: envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"],
             pad: obj.resizePad,
             parent: el(obj.parent || "body"),
-            modal: el(obj.mdWrapper),
             mover: el(obj.moveWrapper)
         }
     }
@@ -51,7 +87,7 @@ const mdiFormCore = () => {
     }
 
     return {
-        setup:(obj) => {
+        create:(obj) => {
             setTimeout(() => { // await rendenization
                 let processMoveEvent, processResizeEvent;
                 const conf = buildConf(obj);

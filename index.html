@@ -8,14 +8,23 @@
                 <div class="title">Título</div>
                 <div class="content">Lorem Ipsum is simply dummy text of <br/>the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took <br/>a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently<br/>with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</div>
             </div>
+            <div id="wrapper2">
+                <div class="title2">Título2</div>
+                <div class="content2">Lorem Ipsum is simply dummy text of </div>
+            </div>
         </div>
         
         <script type="text/javascript">
             const core = mdiFormCore()
-            core.setup({
-                parent:"#limit",
+            core.create({
                 mdWrapper:"#wrapper",
                 moveWrapper: ".title",
+                resizePad: 10,
+                resizable: true        
+            })
+            core.create({
+                mdWrapper:"#wrapper2",
+                moveWrapper: ".title2",
                 resizePad: 10,
                 resizable: true        
             })
@@ -29,6 +38,15 @@
                 flex-direction: column;
                 top: 100px;
                 left: 100px
+            }
+            #wrapper2 {
+                background: #ff00c8;
+                width: 500px;
+                height: 300px;
+                display: flex;
+                flex-direction: column;
+                top: 150px;
+                left: 170px
             }
             #wrapper .content {
                 overflow-y: scroll;
