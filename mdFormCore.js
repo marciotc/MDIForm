@@ -13,11 +13,11 @@ const mdiFormCoreUtils = {
 const mdiFormCoreZIndex = {
     startFrom: 9900,
     forms:[],
-    register:(dom)=> {
+    register:(dom, env)=> {
         const zIndex = mdiFormCoreZIndex.startFrom++;
         mdiFormCoreZIndex.forms.push({dom,zIndex});
         mdiFormCoreZIndex.renderZIndex();
-        dom.addEventListener("click",mdiFormCoreZIndex.buildIndex,false)
+        dom.addEventListener(env.start,mdiFormCoreZIndex.buildIndex,false)
     },
     getArrayIndex: (dom) => {
         let index = -1;
@@ -67,11 +67,12 @@ const mdiFormCore = () => {
         mdiFormCoreUtils.touchAcceleration = obj.touchAcceleration || 1.5;
         mdiFormCoreUtils.throttle = obj.throttle || 10;
         const modal = el(obj.mdWrapper);
-        mdiFormCoreZIndex.register(modal);
+        const env = envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"];
+        mdiFormCoreZIndex.register(modal, env);
         console.log(mdiFormCoreZIndex.forms)
         return {
             modal,
-            env: envEvents[mdiFormCoreUtils.isMobile?"mobile":"web"],
+            env,
             pad: obj.resizePad,
             parent: el(obj.parent || "body"),
             mover: el(obj.moveWrapper)
