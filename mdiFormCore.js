@@ -41,6 +41,7 @@ const mdiFormCore = () => {
         mover.style.userSelect = "none"
     }
     const factory = {
+        debug: true,
         parent: (str) => {
             mdiFormCore.parent = document.querySelector(str)
             return factory;
@@ -127,6 +128,9 @@ const resizeCoreConfiguration = (conf) => {
     const {x:pX,y:pY,width:pW,height:pH} = parent.getBoundingClientRect();
     const initialModalBounds = modal.getBoundingClientRect();
     const {width:mW,height:mH} = initialModalBounds;
+    const minHeight = +window.getComputedStyle(modal,null).getPropertyValue("min-height").replace(/\D/g,'') || 0;
+    const minWidth = +window.getComputedStyle(modal,null).getPropertyValue("min-width").replace(/\D/g,'') || 0;
+    console.log(minHeight)
     
     const cancelHandlers = (handler) => {
         window.addEventListener(env.move, handler, false);
@@ -145,7 +149,7 @@ const resizeCoreConfiguration = (conf) => {
             const diff = mY - clientY;
             const nextHeight = diff + mH;
             const nextTop = mY - diff;
-            if(nextTop < pY) return;
+            if(nextHeight < minHeight || nextTop < pY) return;
             modal.style.top = mY - diff;
             modal.style.height = nextHeight;
             elms['b'].style.top = elms['bl'].style.top = elms['br'].style.top = elms['l'].style.height = elms['r'].style.height = nextHeight + pad;
@@ -159,6 +163,7 @@ const resizeCoreConfiguration = (conf) => {
             mdiFormCoreUtils.toggleUserSelect(false)
             const {clientX} = mdiFormCoreUtils.getClients(e);
             const nextWidth = clientX - mX;
+            if(nextWidth < minWidth) return;
             if(mX + nextWidth + (pad * 2) > Math.abs(pX + pW)) return;
             modal.style.width = nextWidth;
             elms['r'].style.left = elms['br'].style.left = elms['tr'].style.left = elms['t'].style.width = elms['b'].style.width = nextWidth + pad;
@@ -172,6 +177,7 @@ const resizeCoreConfiguration = (conf) => {
             mdiFormCoreUtils.toggleUserSelect(false)
             const {clientY} = mdiFormCoreUtils.getClients(e);
             const nextHeight = clientY - mY;
+            if(nextHeight < minHeight) return;
             if(mY + nextHeight + (pad / 2) > Math.abs(pY - pH)) return;
             modal.style.height = nextHeight;
             elms['b'].style.top = elms['bl'].style.top = elms['br'].style.top = elms['l'].style.height = elms['r'].style.height = nextHeight + pad;
@@ -186,7 +192,7 @@ const resizeCoreConfiguration = (conf) => {
             const diff = clientX - mX;
             const nextWidth = mW - diff - pad;
             const nextLeft = mX + diff - pad;
-            if(nextLeft < pX) return;
+            if(nextWidth < minWidth || nextLeft < pX) return;
             modal.style.left = nextLeft;
             modal.style.width = nextWidth;
             elms['t'].style.width = elms['b'].style.width = elms['br'].style.left = elms['tr'].style.left = elms['r'].style.left = nextWidth + pad;
@@ -249,6 +255,7 @@ const resizeCoreConfiguration = (conf) => {
                     elm.addEventListener(env.start,leftResizeHandler,false)
                 } break;
             }
+            elm.style.background = ['blue','orange','red','green','brown','purple','magenta','yellow'][i]
 
             elm.style.top = top;
             elm.style.left = left;
