@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./mdFormCore.js"></script>
+    </head>
+    <body>
+        <div id="limit">
+            <div id="wrapper">
+                <div class="title">Título</div>
+                <div class="content">Lorem Ipsum is simply dummy text of <br/>the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took <br/>a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently<br/>with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            const core = mdiFormCore()
+            core.setup({
+                parent:"#limit",
+                mdWrapper:"#wrapper",
+                moveWrapper: ".title",
+                resizePad: 10,
+                resizable: true        
+            })
+        </script>
+        <style>
+            #wrapper {
+                background: #fc0;
+                width: 300px;
+                height:200px;
+                display: flex;
+                flex-direction: column;
+                top: 100px;
+                left: 100px
+            }
+            #wrapper .content {
+                overflow-y: scroll;
+                flex:1;
+            }
+            #limit {
+                width: 500px;
+                height: 600px;
+                background: #f0f0f0;
+            }
+        </style>
+    </body>
+</html>
